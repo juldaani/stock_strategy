@@ -1,56 +1,34 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Sep 12 18:31:30 2019
+Created on Sat Sep 14 22:38:00 2019
 
 @author: juho
 """
 
 import numpy as np
 import pandas as pd
-from alpha_vantage.timeseries import TimeSeries
-import time
-
-from params import API_KEY
 
 
 
-# %%
 
-allSymbols = np.genfromtxt('symbols.csv', dtype='str')
-ts = TimeSeries(key=API_KEY)
+PATH_DATAFRAME = 'datas/merged'
 
-# Pick random subset
-symbols = allSymbols[np.random.choice(len(allSymbols), size=100, replace=False)]
+df = pd.read_pickle(PATH_DATAFRAME)
 
-datas, metaDatas = [], []
-for sym in symbols:
-    data, metaData = ts.get_monthly_adjusted(symbols[56])
-    datas.append(data)
-    metaDatas.append(metaData)
-    
-    time.sleep(60/5)
-    print(sym)
-    
-np.save('datas', datas)
-np.save('meta_datas', metaDatas)
 
+
+a = df.loc[str(1800):str(2003)]
+
+stDate = pd.to_datetime(df.first_valid_index())
+
+ + pd.Timedelta(days=365)
+
+a = pd.to_datetime(df.first_valid_index())
+
+df['date'].dt.month==12
+
+df.last_valid_index()
 
 
 # %%
-
-a = np.load('datas.npy')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
