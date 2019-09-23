@@ -14,7 +14,7 @@ import os
 PATH_DATA = 'datas'
 
 
-fnames = os.listdir(PATH_DATA)
+fnames = [fname for fname in os.listdir(PATH_DATA) if 'merged' not in fname]
 
 mergedDf = pd.DataFrame()
 for f in fnames:
@@ -23,7 +23,9 @@ for f in fnames:
     df = pd.read_pickle(os.path.join(PATH_DATA,f))
     df.rename({'5. adjusted close': f}, axis=1, inplace=True)
     mergedDf = pd.concat([mergedDf,df[f]], axis=1, sort=1)
-    
+
+mergedDf.index = pd.to_datetime(mergedDf.index)
+
 mergedDf.to_pickle(os.path.join(PATH_DATA, 'merged'))
 
 # %%
