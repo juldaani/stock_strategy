@@ -16,12 +16,12 @@ from params import API_KEY
 
 
 
-N_SYMBOLS_TO_GET = 20
+N_SYMBOLS_TO_GET = 600
 SYMBOLS_PATH = 'symbols.csv'
 OUT_FOLDER = 'datas'
 
 
-np.random.seed(11)
+np.random.seed(1)
 
 if not os.path.exists(OUT_FOLDER):
     os.makedirs(OUT_FOLDER)

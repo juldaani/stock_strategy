@@ -28,4 +28,5 @@ mergedDf.index = pd.to_datetime(mergedDf.index)
 
 mergedDf.to_pickle(os.path.join(PATH_DATA, 'merged'))
 
+
 # %%
