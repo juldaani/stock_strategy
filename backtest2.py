@@ -21,9 +21,17 @@ WIN_LEN = 10
 df = pd.read_pickle(PATH_DATAFRAME)
 df = df[:'2019-8']      # Hack to remove shit from the end of the dataframe
 
+
+#a = df.values
+#m = np.all(np.isnan(df.values),1)
+#np.sum(m)
+
+
 monthlyReturns = df.pct_change(1)
 monthlyReturns[np.isnan(df)] = np.NaN
 monthlyReturns = monthlyReturns[~np.all(np.isnan(monthlyReturns),1)]
+
+predictions, targets = [], []
 
 returns = pd.DataFrame(columns = [1]*NUM_STOCKS)
 for date in monthlyReturns.index:
@@ -43,61 +51,51 @@ for date in monthlyReturns.index:
     sortedReturns = monthlyReturns.loc[date].values[sorter]
     sortedReturns = sortedReturns[~np.isnan(winMean[sorter])]   # remove nan
     
+    targets.append(monthlyReturns.loc[date].values[sorter])
+    predictions.append(winMean[sorter])
+    
+    if(len(sortedReturns) < 10):
+        continue
+    
     returns.loc[date] = sortedReturns[-NUM_STOCKS:]
 #    returns.loc[date] = sortedReturns[:NUM_STOCKS]
-    
+
+targets, predictions = np.row_stack(targets), np.row_stack(predictions)
+
     
 returns = returns + 1
+returnsNp = returns['2019'].values
+#returnsNp = returns['2009':].values
 
-a = np.prod(returns['2019'])
-#a = np.prod(returns)
-print(a)
-np.sum(a/len(a))
+ret = 1
+for i in range(len(returnsNp)):
+    ret = np.sum(returnsNp[i] * (ret/NUM_STOCKS))
 
-
-# %%
-
-
-groupedByMonth = [monthlyReturns[monthlyReturns.index.month == i] for i in range(1,13)]
-rollingMeans = [groupedByMonth[i].rolling(10).mean().shift(periods=1) for i in range(len(groupedByMonth))]
-rollingMeans = [data[~np.all(np.isnan(data),1)] for data in rollingMeans]   # Remove all nan rows
-
-
-
-returns = []
-
-#i = 0
-#curMeansForMonth = rollingMeans[i]
-
-for curMeansForMonth in rollingMeans:
-    
-    
-    # Get monthly returns for current months
-    trueMonthlyReturns = monthlyReturns.loc[curMeansForMonth.index]
-    trueMonthlyReturns[np.isnan(curMeansForMonth)] = np.NaN
-    
-    for curMeans, curTrueReturns in zip(curMeansForMonth.values, trueMonthlyReturns.values):
-        sorter = np.argsort(curMeans)
-        sortedTrueReturns = curTrueReturns[sorter]
-        sortedTrueReturns = sortedTrueReturns[~np.isnan(sortedTrueReturns)]
-        
-        if(len(sortedTrueReturns) < 5):
-            continue
-        
-        returns.append(sortedTrueReturns[-NUM_BEST:])
-#        returns.append(sortedTrueReturns[:NUM_WORST])
-
-#returns = np.array(returns) + 1
-returns = np.row_stack(returns) + 1
-
-np.prod(returns,0)
-
-# %%
-
-a = np.argsort(rollingMeans[10].values,1)
-
-
-
+print(ret)
 
 
 # %%
+
+m = ~np.all(np.isnan(predictions),0)
+pred, targ = predictions[:,m], targets[:,m]
+
+ii = 3
+
+plt.scatter(targ[:,-ii:].flatten(), pred[:,-ii:].flatten(), alpha=0.9)
+s = 0.4
+plt.plot(np.arange(-s,s+.001,s), np.arange(-s,s+.001,s))
+
+
+targ[:,-ii:].flatten()
+pred[:,-ii:].flatten()
+
+
+
+
+
+
+
+
+
+
+
